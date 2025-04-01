@@ -18,20 +18,44 @@ def gyroStraightWithDistance(distanceByCM, speed):
     while abs(motor.relative_position(port.E)) < distance_degrees:
         error = motion_sensor.tilt_angles()[0] * -0.1
         correction = int(error * -2)
-        print(motor.relative_position(port.E))
+        #print(motor.relative_position(port.E))
         motor_pair.move(motor_pair.PAIR_1, correction, velocity=speed)
     motor_pair.stop(motor_pair.PAIR_1)
-    
+
     motion_sensor.reset_yaw(0)
 
 def gyroStopAtBlackLine(speed):
     motion_sensor.reset_yaw(0)
     motor.reset_relative_position(port.E, 0)
-    
+
     while color_sensor.color(port.A) != color.BLACK:
         error = motion_sensor.tilt_angles()[0] * -0.1
         correction = int(error * -2)
         motor_pair.move(motor_pair.PAIR_1, correction, velocity=speed)
+    motor_pair.stop(motor_pair.PAIR_1)
+
+def gyroBackwardsWithDistance(distanceByCM, speed):
+    motion_sensor.reset_yaw(0)
+    distance_degrees = int(distanceByCM * DEGREES_PER_CM)
+
+    motor.reset_relative_position(port.E, 0)
+    while abs(motor.relative_position(port.E)) < distance_degrees:
+        error = motion_sensor.tilt_angles()[0] * -0.1
+        correction = int(error * -2)
+        #print(motor.relative_position(port.E))
+        motor_pair.move(motor_pair.PAIR_1, correction, velocity=(-1*speed))
+    motor_pair.stop(motor_pair.PAIR_1)
+
+    motion_sensor.reset_yaw(0)
+
+def gyroBackwardsStopAtBlackLine(speed):
+    motion_sensor.reset_yaw(0)
+    motor.reset_relative_position(port.E, 0)
+
+    while color_sensor.color(port.A) != color.BLACK:
+        error = motion_sensor.tilt_angles()[0] * -0.1
+        correction = int(error * -2)
+        motor_pair.move(motor_pair.PAIR_1, correction, velocity=(-1*speed))
     motor_pair.stop(motor_pair.PAIR_1)
 
 def gyroTurnRight(angle):
@@ -39,12 +63,22 @@ def gyroTurnRight(angle):
         motor_pair.move(motor_pair.PAIR_1, 100)
     motor_pair.stop(motor_pair.PAIR_1)
 
+def gyroTurnLeft(angle):
+    while(abs(motion_sensor.tilt_angles()[0]) < angle):
+        motor_pair.move(motor_pair.PAIR_1, -100);
+    motor_pair.stop(motor_pair.PAIR_1)
+
+def pivotTurnRight(angle):
+    while abs(motion_sensor.tilt_angles()[0]) < angle:
+        motor_pair.move(motor_pair.PAIR_1, 50)
+    motor_pair.stop(motor_pair.PAIR_1)
+
+def pivotTurnLeft(angle):
+    while abs(motion_sensor.tilt_angles()[0]) < angle:
+        motor_pair.move(motor_pair.PAIR_1, -50)
+    motor_pair.stop(motor_pair.PAIR_1)
 async def main():
     motor_pair.unpair(motor_pair.PAIR_1)
     motor_pair.pair(motor_pair.PAIR_1,port.E,port.F)
-    #gyroStraightWithDistance(10, 600)
-    #gyroTurnRight(900)
-    #lineFollowWithDistance(20, 300)
-    #gyroStopAtBlackLine(300)
 
 runloop.run(main())

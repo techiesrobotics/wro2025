@@ -4,6 +4,23 @@ import runloop, motor_pair, color_sensor, math, time, motor, color
 
 WHEEL_SIZE = 17.5
 DEGREES_PER_CM = 360/WHEEL_SIZE
+def pid_line_follow_ForDistance(distanceByCM, speed):
+    integral = 0
+    lastError = 0
+    motor.reset_relative_position(port.E, 0)
+    while abs(motor.relative_position(port.E)) < DEGREES_PER_CM*distanceByCM:
+        error = 50 - color_sensor.reflection(port.A)
+        P_fix = error * 0.5
+        integral = integral + error
+        I_fix = integral * 0.001
+        derivative = error - lastError
+        lastError = error
+        D_fix = derivative * 1
+        correction = min(100, max(-100, int(P_fix + I_fix + D_fix)))
+        
+        motor_pair.move(motor_pair.PAIR_1, correction, velocity = speed)
+    motor_pair.stop(motor_pair.PAIR_1)
+
 
 def lineFollowWithDistance(distanceByCM, speed):
     while motor.relative_position(port.E) < DEGREES_PER_CM*distanceByCM:

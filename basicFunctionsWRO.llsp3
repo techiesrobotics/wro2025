@@ -8,6 +8,9 @@ TURN_TYPE_SPIN = 100
 TURN_TYPE_PIVOT = 50
 
 def lineFollowWithDistance(distanceByCM, speed):
+    motor.reset_relative_position(port.E, 0)
+    motion_sensor.reset_yaw(0)
+    time.sleep_ms(5)
     while motor.relative_position(port.E) < DEGREES_PER_CM*distanceByCM:
         motor_pair.move(motor_pair.PAIR_1,(math.floor(-3/5)*color_sensor.reflection(port.A)+30),velocity=speed)
     motor_pair.stop(motor_pair.PAIR_1)
@@ -15,8 +18,8 @@ def lineFollowWithDistance(distanceByCM, speed):
 def gyroStraightWithDistance(distanceByCM, speed):
     motion_sensor.reset_yaw(0)
     distance_degrees = int(distanceByCM * DEGREES_PER_CM)
-
     motor.reset_relative_position(port.E, 0)
+    time.sleep_ms(5)
     while abs(motor.relative_position(port.E)) < distance_degrees:
         error = motion_sensor.tilt_angles()[0] * -0.1
         correction = int(error * -2)
@@ -29,7 +32,7 @@ def gyroStraightWithDistance(distanceByCM, speed):
 def gyroStopAtBlackLine(speed):
     motion_sensor.reset_yaw(0)
     motor.reset_relative_position(port.E, 0)
-
+    time.sleep_ms(5)
     while color_sensor.color(port.A) != color.BLACK:
         error = motion_sensor.tilt_angles()[0] * -0.1
         correction = int(error * -2)
@@ -39,8 +42,8 @@ def gyroStopAtBlackLine(speed):
 def gyroBackwardsWithDistance(distanceByCM, speed):
     motion_sensor.reset_yaw(0)
     distance_degrees = int(distanceByCM * DEGREES_PER_CM)
-
     motor.reset_relative_position(port.E, 0)
+    time.sleep_ms(5)
     while abs(motor.relative_position(port.E)) < distance_degrees:
         error = motion_sensor.tilt_angles()[0] * -0.1
         correction = int(error * -2)
@@ -53,14 +56,14 @@ def gyroBackwardsWithDistance(distanceByCM, speed):
 def gyroBackwardsStopAtBlackLine(speed):
     motion_sensor.reset_yaw(0)
     motor.reset_relative_position(port.E, 0)
-
+    time.sleep_ms(5)
     while color_sensor.color(port.A) != color.BLACK:
         error = motion_sensor.tilt_angles()[0] * -0.1
         correction = int(error * -2)
         motor_pair.move(motor_pair.PAIR_1, correction, velocity=(-1*speed))
     motor_pair.stop(motor_pair.PAIR_1)
 
-def gyroTurnRight(angle):
+'''def gyroTurnRight(angle):
     while abs(motion_sensor.tilt_angles()[0]) < angle:
         motor_pair.move(motor_pair.PAIR_1, 100)
     motor_pair.stop(motor_pair.PAIR_1)
@@ -71,30 +74,31 @@ def gyroTurnLeft(angle):
     motor_pair.stop(motor_pair.PAIR_1)
 
 def pivotTurnRight(angle):
+    motion_sensor.reset_yaw(0)
     while abs(motion_sensor.tilt_angles()[0]) < angle:
         motor_pair.move(motor_pair.PAIR_1, 50)
     motor_pair.stop(motor_pair.PAIR_1)
 
 def pivotTurnLeft(angle):
+    motion_sensor.reset_yaw(0)
     while abs(motion_sensor.tilt_angles()[0]) < angle:
         motor_pair.move(motor_pair.PAIR_1, -50)
     motor_pair.stop(motor_pair.PAIR_1)
-
+'''
 def gyroTurnRight(turn_Type, degrees, speed):
     global TURN_TYPE_SPIN, TURN_TYPE_PIVOT
     motion_sensor.reset_yaw(0)
-    while True:
-        if abs(motion_sensor.tilt_angles()[0]) < degrees * 10:
-            motor_pair.move(motor_pair.PAIR_1, turn_Type, velocity=speed)
-        else:
-            motor_pair.stop(motor_pair.PAIR_1)
-            break
+    time.sleep_ms(5)
+    while abs(motion_sensor.tilt_angles()[0]) < degrees *10: # robot gyro sensor reads value and compared it to preset degrees
+        motor_pair.move(motor_pair.PAIR_1, turn_Type, velocity=speed) # robot turns to left
+    motor_pair.stop(motor_pair.PAIR_1)
 
 def gyroTurnLeft(turn_Type, degrees, speed): # turns right at specified degrees (0 to 90), using Gyro or motion sensor
     global TURN_TYPE_SPIN, TURN_TYPE_PIVOT
     motion_sensor.reset_yaw(0)
-
-    while abs(motion_sensor.tilt_angles()[0])< degrees *10: # robot gyro sensor reads value and compared it to preset degrees
+    time.sleep_ms(5)
+    startYaw = motion_sensor.tilt_angles()[0];
+    while abs(startYaw - motion_sensor.tilt_angles()[0])< degrees *10: # robot gyro sensor reads value and compared it to preset degrees
         motor_pair.move(motor_pair.PAIR_1, -1 * turn_Type, velocity=speed) # robot turns to left
     motor_pair.stop(motor_pair.PAIR_1)
 
@@ -106,7 +110,8 @@ async def main():
     #gyroStraightWithDistance(20, 300)
     #gyroTurnLeft(TURN_TYPE_PIVOT, 90, 200)
     #gyroTurnRight(TURN_TYPE_PIVOT, 90, 200)
-    pivotTurnLeft(900)
-    pivotTurnRight(900)
+    motion_sensor.set_yaw_face(motion_sensor.TOP)
+    gyroTurnLeft(TURN_TYPE_PIVOT, 90, 200)
+    gyroTurnRight(TURN_TYPE_PIVOT, 90, 200)
 
 runloop.run(main())

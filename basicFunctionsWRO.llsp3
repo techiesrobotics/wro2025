@@ -4,23 +4,8 @@ import runloop, motor_pair, color_sensor, math, time, motor, color
 
 WHEEL_SIZE = 17.5
 DEGREES_PER_CM = 360/WHEEL_SIZE
-def pid_line_follow_ForDistance(distanceByCM, speed):
-    integral = 0
-    lastError = 0
-    motor.reset_relative_position(port.E, 0)
-    while abs(motor.relative_position(port.E)) < DEGREES_PER_CM*distanceByCM:
-        error = 50 - color_sensor.reflection(port.A)
-        P_fix = error * 0.5
-        integral = integral + error
-        I_fix = integral * 0.001
-        derivative = error - lastError
-        lastError = error
-        D_fix = derivative * 1
-        correction = min(100, max(-100, int(P_fix + I_fix + D_fix)))
-        
-        motor_pair.move(motor_pair.PAIR_1, correction, velocity = speed)
-    motor_pair.stop(motor_pair.PAIR_1)
-
+TURN_TYPE_SPIN = 100 
+TURN_TYPE_PIVOT = 50
 
 def lineFollowWithDistance(distanceByCM, speed):
     while motor.relative_position(port.E) < DEGREES_PER_CM*distanceByCM:
@@ -94,6 +79,25 @@ def pivotTurnLeft(angle):
     while abs(motion_sensor.tilt_angles()[0]) < angle:
         motor_pair.move(motor_pair.PAIR_1, -50)
     motor_pair.stop(motor_pair.PAIR_1)
+
+def gyroTurnRight(turn_Type, degrees, speed):
+    global TURN_TYPE_SPIN, TURN_TYPE_PIVOT
+    motion_sensor.reset_yaw(0)
+    while True:
+        if abs(motion_sensor.tilt_angles()[0]) < degrees * 10:
+            motor_pair.move(motor_pair.PAIR_1, turn_Type, velocity=speed) 
+        else:
+            motor_pair.stop(motor_pair.PAIR_1)
+            break
+
+ def gyroTurnLeft(turn_Type, degrees, speed): # turns right at specified degrees (0 to 90), using Gyro or motion sensor
+    global TURN_TYPE_SPIN, TURN_TYPE_PIVOT
+    motion_sensor.reset_yaw(0)
+    
+    while abs(motion_sensor.tilt_angles()[0])< degrees *10: # robot gyro sensor reads value and compared it to preset degrees
+        motor_pair.move(motor_pair.PAIR_1, -1 * turn_Type, velocity=speed) # robot turns to left
+    motor_pair.stop(motor_pair.PAIR_1)
+
 async def main():
     motor_pair.unpair(motor_pair.PAIR_1)
     motor_pair.pair(motor_pair.PAIR_1,port.E,port.F)

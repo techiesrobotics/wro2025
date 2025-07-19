@@ -156,7 +156,7 @@ def grabLeft(i):
         MoveBackward(60)
     else:
         MoveBackward(60)
-    drive_base.turn(-30)
+    drive_base.turn(-31)
     drive_base.turn(10)
     MoveBackward(77)
 
@@ -164,13 +164,13 @@ def isRed(hVal):
     return hVal >= 340 and hVal <= 360
     
 def isWhite(hVal, sVal):
-    return (hVal >= 180 and hVal <= 270) or (sVal >= 5 and sVal <= 16)
+    return (hVal >= 180 and hVal <= 270) or (sVal >= 7 and sVal <= 11)
 
 def isYellow(hVal):
     return hVal >= 45 and hVal <= 55
 
 def isGreen(hVal):
-    return hVal >= 150 and hVal <= 170
+    return hVal >= 140 and hVal <= 170
 
 async def moveArmUp(arm, speed, angle):
     await arm.run_angle(speed, angle)
@@ -183,25 +183,46 @@ async def MoveForward_As(distance):
 
 async def DriveForwardAndMoveArm(distance, arm, armSpeed, angle):
     await multitask(MoveForward_As(distance), moveArmUp(arm, armSpeed, angle))
+'''
+def test(hVal, sVal):
+    print(hVal, sVal)
+    hVal = color_sensor_front.hsv().h
+    sVal = color_sensor_front.hsv().s
+    if(isRed(hVal)):
+        print("red")
+    elif(isWhite(hVal, sVal)):
+        print("white")
+    elif(isGreen(hVal)):
+        print("green")
+    elif(isYellow(hVal)):
+        print("yellow")
+    else:
+        print("none")
+hVal = color_sensor_front.hsv().h
+sVal = color_sensor_front.hsv().s
+test(hVal, sVal)
+'''
+
 
 #making its way to the balls
 run_task(DriveForwardAndMoveArm(-250, front_arm, 500, -105))
 drive_base.turn(-90)
-MoveForward(-300)
+MoveForward(-298)
 drive_base.turn(-90)
 
 #This code below collects the balls with the front arm
-MoveForwardWithAccel(175, 2000, 500, -1)
-MoveForwardWithAccel(35, 1000, 500, 1)
-MoveArmWithStallTimeDetection(front_arm, -100, 30, 200)
+MoveForwardWithAccel(185, 2000, 500, -1)
+MoveArmWithStallTimeDetection(front_arm, -100, 10, 200)
+MoveForwardWithAccel(40, 1000, 500, 1)
+MoveArmWithStallTimeDetection(front_arm, -100, 10, 200)
 MoveForwardWithAccel(110, 1000, 500, -1)
 MoveArmWithStallTimeDetection(front_arm, -100, 10, 200)
 MoveForwardWithAccel(100, 1000, 500, 1)
 MoveArmWithStallTimeDetection(front_arm, 100, 30, 500)
-MoveForward(155)
+MoveForward(160)
 #getting to mars rover and completing it
 back_arm.run_angle(500, -75)
-MoveForward(-115)
+MoveForward(-120)
 #getting to the container
 drive_base.turn(-90)
 run_task(DriveForwardAndMoveArm(425, back_arm, 150, 75))
@@ -209,12 +230,13 @@ drive_base.turn(-90)
 run_task(DriveForwardAndMoveArm(-85, back_arm, 100, -105))
 
 #This code below opens the door with the back arm
-MoveForward(70)
-MoveBackward(8)
+MoveForward(55)
+MoveBackward(7)
 MoveArmWithStallTimeDetection(back_arm, 100, 10, 500)
-run_task(DriveForwardAndMoveArm(110, back_arm, 60, 30))
+run_task(DriveForwardAndMoveArm(110, back_arm, 55, 30))
 MoveForward(20)
 MoveBackward(20)
+
 #front_arm.run_angle(350, 130)
 MoveArmWithStallTimeDetection(front_arm, 300, 70, 500)
 wait(1000)
@@ -223,7 +245,7 @@ wait(1000)
 MoveArmWithStallTimeDetection(front_arm, -100, 100, 500)
 SetSpeed(600)
 MoveBackward(300)
-MoveArmWithStallTimeDetection(front_arm, 100, 100, 500)
+MoveArmWithStallTimeDetection(front_arm, 100, 130, 500)
 back_arm.run_angle(100, 50)
 SetSpeed(300)
 drive_base.turn(-90)
@@ -241,8 +263,11 @@ SetGyro(False)
 MoveBackward(150)
 SetGyro(True)
 MoveArmWithStallTimeDetection(back_arm, -350, 180, 500)
-
+MoveArmWithStallTimeDetection(front_arm, 200, 50, 500)
+whiteCnt = 0
+#PauseMission()
 #This code picks up the colored blocks
+MoveForward(5)
 for i in range(6):
     hVal = color_sensor_front.hsv().h
     sVal = color_sensor_front.hsv().s
@@ -254,6 +279,7 @@ for i in range(6):
     elif(isWhite(hVal, sVal)):
         print("white")
         grabRight(i)
+        whiteCnt = whiteCnt + 1
         if(greenAtFront == -1):
             greenAtFront = 1
     elif(isGreen(hVal)):
@@ -268,14 +294,19 @@ for i in range(6):
             yellowAtFront = 0
     else:
         print("none")
-    if(i <= 2 or i == 4):
+    if(whiteCnt > 1):
+        greenAtFront = 0
+    if(i <= 2):
         MoveForward(95)
     elif(i >= 3 and i < 4):
         MoveForward(91)
+    elif(i == 4):
+        MoveForward(103)
     else:
         MoveForward(91)
-    # if(i % 2 == 1 and i != 3):
-    #     drive_base.turn(1)
+    if(i == 1 or i == 3):
+        drive_base.turn(1)
+    print(hVal, sVal)
 
 #this code pushes the drone into the home area
 SetTurnSpeed(300)
@@ -296,9 +327,9 @@ SetGyro(True)
 SetSpeed(200)
 SetTurnSpeed(100)
 if(yellowAtFront == 1):
-    MoveForward(170)
+    MoveForward(175)
 else:
-    MoveForward(155)
+    MoveForward(160)
 drive_base.turn(90)
 SetSpeed(600)
 MoveForward(600)
@@ -307,14 +338,14 @@ MoveForward(600)
 if(yellowAtFront == 1):
     SetSpeed(200)
     StopAtWhite(200)
-    MoveForward(625)
+    MoveForward(635)
     front_arm.stop()
     MoveArmWithStallTimeDetection(back_arm, 200, 90, 500)
     MoveBackward(50)
     MoveArmWithStallTimeDetection(back_arm, -120, 90, 500)
     MoveBackward(30)
     MoveArmWithStallTimeDetection(back_arm, -30, 90, 500)
-    MoveBackward(30)
+    MoveBackward(40)
     SetTurnSpeed(70)
     drive_base.turn(35)
     SetTurnSpeed(100)
@@ -337,7 +368,7 @@ else:
     MoveBackward(50)
     MoveArmWithStallTimeDetection(back_arm, -160, 90, 500)
     MoveForward(95)
-    MoveBackward(65)
+    MoveBackward(70)
     drive_base.turn(-35)
     MoveArmWithStallTimeDetection(back_arm, 160, 90, 500)
     MoveBackward(100)
@@ -360,7 +391,7 @@ SetSpeed(600)
 if(greenAtFront == 1):
     MoveForward(450)
 else:
-    MoveForward(425)
+    MoveForward(435)
 drive_base.brake()
 SetSpeed(200)
 drive_base.turn(90)
@@ -385,20 +416,20 @@ if(greenAtFront == 1):
     MoveBackward(90)
     drive_base.turn(19)
 else:
-    MoveForward(375)
+    MoveForward(350)
     drive_base.turn(-29)
     MoveForward(50)
     MoveArmWithStallTimeDetection(front_arm, -200, 70, 500)
-    MoveBackward(50)
+    MoveBackward(60)
     MoveArmWithStallTimeDetection(front_arm, 140, 70, 500)
-    MoveForward(130)
+    MoveForward(160)
     MoveBackward(135)
     drive_base.turn(27)
     MoveForward(140)
     MoveArmWithStallTimeDetection(front_arm, -140, 70, 500)
-    MoveBackward(100)
+    MoveBackward(120)
     MoveArmWithStallTimeDetection(front_arm, 200, 70, 500)
-    MoveForward(75)
+    MoveForward(95)
     MoveBackward(90)
 
 #discarded (very last part)
@@ -417,6 +448,6 @@ else:
 SetSpeed(250)
 MoveForward(300)
 drive_base.turn(-3)
-MoveForward(400)
+MoveForward(320)
 left_motor.run_angle(500, 80)
 wait(5000)

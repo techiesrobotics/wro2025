@@ -267,7 +267,7 @@ MoveArmWithStallTimeDetection(front_arm, 200, 50, 500)
 whiteCnt = 0
 #PauseMission()
 #This code picks up the colored blocks
-MoveForward(5)
+MoveForward(3)
 for i in range(6):
     hVal = color_sensor_front.hsv().h
     sVal = color_sensor_front.hsv().s
@@ -294,16 +294,10 @@ for i in range(6):
             yellowAtFront = 0
     else:
         print("none")
-    if(whiteCnt > 1):
-        greenAtFront = 0
-    if(i <= 2):
+    if(i == 4):
         MoveForward(95)
-    elif(i >= 3 and i < 4):
-        MoveForward(91)
-    elif(i == 4):
-        MoveForward(103)
     else:
-        MoveForward(91)
+        MoveForward(93)
     if(i == 1 or i == 3):
         drive_base.turn(1)
     print(hVal, sVal)

@@ -203,7 +203,8 @@ sVal = color_sensor_front.hsv().s
 test(hVal, sVal)
 '''
 
-
+SetSpeed(400)
+SetTurnSpeed(300)
 #making its way to the balls
 run_task(DriveForwardAndMoveArm(-250, front_arm, 500, -105))
 drive_base.turn(-90)
@@ -211,6 +212,7 @@ MoveForward(-298)
 drive_base.turn(-90)
 
 #This code below collects the balls with the front arm
+SetSpeed(200)
 MoveForwardWithAccel(185, 2000, 500, -1)
 MoveArmWithStallTimeDetection(front_arm, -100, 10, 200)
 MoveForwardWithAccel(40, 1000, 500, 1)
@@ -219,6 +221,7 @@ MoveForwardWithAccel(110, 1000, 500, -1)
 MoveArmWithStallTimeDetection(front_arm, -100, 10, 200)
 MoveForwardWithAccel(100, 1000, 500, 1)
 MoveArmWithStallTimeDetection(front_arm, 100, 30, 500)
+SetSpeed(400)
 MoveForward(160)
 #getting to mars rover and completing it
 back_arm.run_angle(500, -75)
@@ -255,8 +258,10 @@ SetGyro(True)
 SetSpeed(200)
 MoveForward(70)
 drive_base.turn(90)
-StopAtWhite(-150)
+StopAtWhite(-250)
 MoveForward(27)
+SetSpeed(200)
+SetTurnSpeed(100)
 drive_base.turn(-90)
 
 SetGyro(False)
@@ -304,7 +309,7 @@ for i in range(6):
 
 #this code pushes the drone into the home area
 SetTurnSpeed(300)
-SetSpeed(450)
+SetSpeed(600)
 drive_base.turn(-35)
 MoveForward(430)
 drive_base.turn(-55)
@@ -318,7 +323,7 @@ drive_base.turn(-90)
 SetGyro(False)
 MoveBackward(300)
 SetGyro(True)
-SetSpeed(200)
+SetSpeed(350)
 SetTurnSpeed(100)
 if(yellowAtFront == 1):
     MoveForward(175)
@@ -327,11 +332,11 @@ else:
 drive_base.turn(90)
 SetSpeed(600)
 MoveForward(600)
-
 #drop off yellow and red blocks
 if(yellowAtFront == 1):
-    SetSpeed(200)
+    SetSpeed(400)
     StopAtWhite(200)
+    SetSpeed(400)
     MoveForward(635)
     front_arm.stop()
     MoveArmWithStallTimeDetection(back_arm, 200, 90, 500)
@@ -353,8 +358,9 @@ if(yellowAtFront == 1):
     drive_base.turn(-35)
     MoveBackward(200)
 else:
-    SetSpeed(200)
+    SetSpeed(400)
     StopAtWhite(200)
+    SetSpeed(400)
     MoveForward(540)
     front_arm.stop()
     drive_base.turn(35)
@@ -378,22 +384,22 @@ SetGyro(False)
 MoveBackward(350)
 SetGyro(True)
 drive_base.stop()
-SetSpeed(300)
+SetSpeed(500)
 run_task(DriveForwardAndMoveArm(300, back_arm, 100, 90))
 StopAtWhite(300)
 SetSpeed(600)
 if(greenAtFront == 1):
-    MoveForward(450)
+    MoveForward(455)
 else:
     MoveForward(435)
 drive_base.brake()
 SetSpeed(200)
 drive_base.turn(90)
-SetSpeed(200)
+SetSpeed(400)
 
 #drop off white and green blocks
 if(greenAtFront == 1):
-    MoveForward(420)
+    MoveForward(415)
     MoveArmWithStallTimeDetection(front_arm, -200, 70, 500)
     MoveBackward(80)
     MoveArmWithStallTimeDetection(front_arm, 200, 20, 500)
